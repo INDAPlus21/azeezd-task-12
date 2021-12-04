@@ -1,12 +1,16 @@
 mod visuals;
+mod fractals;
 
 fn main()
 {
-    let mut a = visuals::visualizer::Visualizer::new();
+    let args = std::env::args().collect::<Vec<String>>();
 
-    while a.window.is_open() {
-        a.draw_circle((200, 200), 300, visuals::colours::CERISE);
-        a.draw_circle((400, 400), 200, visuals::colours::CERISE);
-        a.window.update_with_buffer(&a.buffer, 800, 600).unwrap();
+    if args.len() < 3 {
+        panic!("Insufficent arguments provided!")
+    }
+
+    match args[1].as_str().to_lowercase().trim() {
+        "cantor" => fractals::cantor::CantorsSet::new().draw(),
+        _ => panic!("No such fractal \"{}\"", args[1])
     }
 }

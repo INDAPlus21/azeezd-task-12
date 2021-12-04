@@ -1,9 +1,9 @@
 extern crate minifb;
-use minifb::{Window, WindowOptions};
+use minifb::{Window, WindowOptions, Key};
 
 // Screen size
-const WIDTH : usize = 800;
-const HEIGHT : usize = 600;
+pub const WIDTH : usize = 800;
+pub const HEIGHT : usize = 600;
 
 /// # `Visualizer`
 /// Struct used to manipulate the pixel buffer of the screen
@@ -24,7 +24,7 @@ impl Visualizer {
                                 WindowOptions::default()).unwrap()
         };
 
-        vis.window.limit_update_rate(Some(std::time::Duration::from_millis(17)));
+        vis.window.limit_update_rate(Some(std::time::Duration::from_millis(10)));
 
         vis
     }
@@ -55,10 +55,8 @@ impl Visualizer {
         }
     }
 
-    /// # `draw_line`
-    /// Takes a starting position `(usize)` and an ending position `(usize, usize)` and a colour `(u32)` 
-    /// then draws a line from a starting point to an ending point using Bersenham Line Algorithm
-    pub fn draw_line(&mut self, start: (usize, usize), end: (usize, usize), colour: u32) -> Result<(), &'static str> {
+    
+    fn draw_line_at(&mut self, start: (usize, usize), end: (usize, usize), colour: u32) -> Result<(), &'static str> {
         let start = (start.0 as isize, start.1 as isize);
         let end = (end.0 as isize, end.1 as isize);
 
@@ -81,6 +79,20 @@ impl Visualizer {
                 }
                 Err(err) => return Err(err)
             }
+        }
+
+        Ok(())
+    }
+
+    /// # `draw_line`
+    /// Takes a starting position `(usize)` and an ending position `(usize, usize)` and a colour `(u32)` 
+    /// then draws a line from a starting point to an ending point using Bersenham Line Algorithm
+    pub fn draw_line(&mut self, start: (usize, usize), end: (usize, usize), colour: u32, thickness: usize) -> Result<(), &'static str> {
+        for thick in 0..thickness {
+            self.draw_line_at(
+                (start.0 - thick, start.1 - thick), 
+                (end.0 - thick, end.1 - thick), 
+                colour);
         }
 
         Ok(())
@@ -124,6 +136,20 @@ impl Visualizer {
                 d = d + 4 * x + 6;
             }
             self.draw_circle_edge(center, (x as usize,y as usize), colour);
+        }
+    }
+
+    /// # `apply_buffer`
+    /// Draws the content of the buffer unto the window
+    pub fn apply_buffer(&mut self) {
+        self.window.update_with_buffer(&self.buffer, WIDTH, HEIGHT);
+    }
+
+    /// # `end`
+    /// Should always be placed at the end of a visualization to avoid window from closing
+    pub fn end(&mut self) {
+        while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
+            self.window.update();
         }
     }
 }
