@@ -14,8 +14,10 @@ pub struct Visualizer {
 
 impl Visualizer {
     /// # `new`
-    /// Creates a new Visualizer with an empty buffer and returns it
-    pub fn new() -> Visualizer {
+    /// Creates a new Visualizer with an empty buffer and returns it.
+    /// ## Parameters
+    /// `update_rate: Option<u64>` - Amount of milliseconds between each screen update. `None` is for default which is 17ms
+    pub fn new(update_rate: Option<u64>) -> Visualizer {
         let mut vis = Visualizer {
             buffer: vec![0; WIDTH * HEIGHT], 
             window: Window::new("Fractal Visualizer", 
@@ -24,7 +26,12 @@ impl Visualizer {
                                 WindowOptions::default()).unwrap()
         };
 
-        vis.window.limit_update_rate(Some(std::time::Duration::from_millis(10)));
+        vis.window.limit_update_rate(
+            match update_rate {
+                Some(t) => Some(std::time::Duration::from_millis(t)),
+                _ => Some(std::time::Duration::from_millis(17))
+            }
+        );
 
         vis
     }
@@ -55,7 +62,9 @@ impl Visualizer {
         }
     }
 
-    
+    /// # `draw_line_at`
+    /// PART OF MAIN DRAW LINE FUNCTION
+    /// Draws a line using the Bersenham Line Algorithm byt taking a starting point `(usize, usize)`, terminal point `(usize, usize)` and colour data `u32`
     fn draw_line_at(&mut self, start: (usize, usize), end: (usize, usize), colour: u32) -> Result<(), &'static str> {
         let start = (start.0 as isize, start.1 as isize);
         let end = (end.0 as isize, end.1 as isize);
@@ -85,8 +94,8 @@ impl Visualizer {
     }
 
     /// # `draw_line`
-    /// Takes a starting position `(usize)` and an ending position `(usize, usize)` and a colour `(u32)` 
-    /// then draws a line from a starting point to an ending point using Bersenham Line Algorithm
+    /// Takes a starting position `(usize)` and an terminal position `(usize, usize)` and a colour `(u32)` and thickness `usize`
+    /// then draws a line from a starting point to an terminal point using Bersenham Line Algorithm
     pub fn draw_line(&mut self, start: (usize, usize), end: (usize, usize), colour: u32, thickness: usize) -> Result<(), &'static str> {
         for thick in 0..thickness {
             self.draw_line_at(
@@ -118,7 +127,7 @@ impl Visualizer {
 
     /// # `draw_circle`
     /// Takes a center `(usize, usize)` and a radius `(usize, usize)` and a colour `(u32)` 
-    /// and draws a circle using the Bersenham Circle Algorithm by
+    /// and draws a circle using the Bersenham Circle Algorithm
     pub fn draw_circle(&mut self, center: (usize, usize), radius: usize, colour: u32) {
         let mut x = 0 as isize;
         let mut y = radius as isize;
@@ -151,5 +160,15 @@ impl Visualizer {
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
             self.window.update();
         }
+    }
+
+    /// # `clear`
+    /// Fills the enter buffer with the given colour. `None` is default for black
+    pub fn clear(&mut self, colour: Option<u32>) {
+        let colour = match colour {
+            Some(a) => a,
+            _ => super::colours::BLACK
+        };
+        self.buffer = vec![colour; WIDTH * HEIGHT];
     }
 }

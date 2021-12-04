@@ -7,6 +7,7 @@ use super::super::visuals::{
 const RECURSION_DEPTH : usize = 8;
 const STARTING_POINT : (usize, usize) = (50, 50);
 const LINE_LENGTH : usize = WIDTH - 2 * STARTING_POINT.0;
+const Y_AXIS_STEP : usize = 20;
 
 /// # `CantorSet`
 /// Visualizes the Cantor Set fractal
@@ -20,7 +21,7 @@ impl CantorsSet {
     /// Initialize the CantorSet Fractal
     pub fn new() -> CantorsSet {
         CantorsSet {
-            visualizer: Visualizer::new()
+            visualizer: Visualizer::new(None)
         }
     }
 
@@ -30,7 +31,7 @@ impl CantorsSet {
         self.visualizer.draw_line(coord, (coord.0 + len, coord.1), colours::CERISE, 3);
         self.visualizer.apply_buffer();
 
-        coord.1 += 20 * depth;
+        coord.1 += Y_AXIS_STEP * depth;
         depth += 1;
 
         self.cantor(coord, len / 3, depth);
