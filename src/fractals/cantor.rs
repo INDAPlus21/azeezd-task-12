@@ -4,10 +4,12 @@ use super::super::visuals::{
     colours
 };
 
+use crate::math::vector::Vector2;
+
 const RECURSION_DEPTH : usize = 8;
-const STARTING_POINT : (usize, usize) = (50, 50);
-const LINE_LENGTH : usize = WIDTH - 2 * STARTING_POINT.0;
-const Y_AXIS_STEP : usize = 20;
+const STARTING_POINT : Vector2 = Vector2{x: 50.0, y:50.0} ;
+const LINE_LENGTH : f32 = WIDTH - 2.0 * STARTING_POINT.x;
+const Y_AXIS_STEP : f32 = 20.0;
 
 /// # `CantorSet`
 /// Visualizes the Cantor Set fractal
@@ -25,17 +27,17 @@ impl CantorsSet {
         }
     }
 
-    fn cantor(&mut self, mut coord: (usize, usize), len: usize, mut depth: usize) {
+    fn cantor(&mut self, mut coord: Vector2, len: f32, mut depth: usize) {
         if depth >= RECURSION_DEPTH {return;}
 
-        self.visualizer.draw_line(coord, (coord.0 + len, coord.1), colours::CERISE, 3);
+        self.visualizer.draw_line(coord, Vector2::new(coord.x + len, coord.y), colours::CERISE, 3);
         self.visualizer.apply_buffer();
 
-        coord.1 += Y_AXIS_STEP * depth;
+        coord.y += Y_AXIS_STEP * depth as f32;
         depth += 1;
-
-        self.cantor(coord, len / 3, depth);
-        self.cantor((coord.0  + len * 2 / 3, coord.1), len / 3, depth);
+        
+        self.cantor(coord, len / 3.0, depth);
+        self.cantor(Vector2::new(coord.x  + len * 2.0 / 3.0, coord.y), len / 3.0, depth);
     } 
 
     /// # `draw`

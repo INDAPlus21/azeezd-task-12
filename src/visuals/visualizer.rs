@@ -1,9 +1,15 @@
 extern crate minifb;
 use minifb::{Window, WindowOptions, Key};
 
+use crate::math::vector::*;
+
 // Screen size
-pub const WIDTH : usize = 800;
-pub const HEIGHT : usize = 600;
+pub const WIDTH : f32 = 800.0;
+pub const HEIGHT : f32 = 600.0;
+
+// As usize for buffer access
+const U_WIDTH : usize = WIDTH as usize;
+const U_HEIGHT : usize = HEIGHT as usize;
 
 /// # `Visualizer`
 /// Struct used to manipulate the pixel buffer of the screen
@@ -19,10 +25,10 @@ impl Visualizer {
     /// `update_rate: Option<u64>` - Amount of milliseconds between each screen update. `None` is for default which is 17ms
     pub fn new(update_rate: Option<u64>) -> Visualizer {
         let mut vis = Visualizer {
-            buffer: vec![0; WIDTH * HEIGHT], 
+            buffer: vec![0; WIDTH as usize * HEIGHT as usize], 
             window: Window::new("Fractal Visualizer", 
-                                WIDTH, 
-                                HEIGHT, 
+                                WIDTH as usize, 
+                                HEIGHT as usize, 
                                 WindowOptions::default()).unwrap()
         };
 
@@ -39,18 +45,18 @@ impl Visualizer {
     /// # `coord_to_buffer_idx`
     /// Takes a coordinate in the form of `(usize, usize)` and returns the index of that point in the buffer.
     /// Returns a result which will contain and error if the coordinate are out of bounds
-    fn coord_to_buffer_idx(coordinate: (usize, usize)) -> Result<usize, &'static str> {
+    fn coord_to_buffer_idx(coordinate: Vector2) -> Result<usize, &'static str> {
         match coordinate {
-            _ if coordinate.0 >= WIDTH => Err("Index out of bounds!"),
-            _ if coordinate.1 >= HEIGHT => Err("Index out of bounds!"),
-            _ => Ok(coordinate.0 + coordinate.1 * WIDTH)
+            _ if coordinate.x as isize >= WIDTH as isize => Err("Index out of bounds!"),
+            _ if coordinate.y as isize >= HEIGHT as isize => Err("Index out of bounds!"),
+            _ => Ok(coordinate.x as usize + coordinate.y as usize * U_WIDTH)
         }
     }
 
     /// # `set_pixel`
     /// Takes a coordinate value as `(usize, usize)` and a colour value as `u32` and sets the pixel at that coordinate to that given colour.
     /// Returns a result which will contain an error if the coordinate is out of bounds
-    pub fn set_pixel(&mut self, coordinate: (usize, usize), value: u32) -> Result<(), &'static str> {
+    pub fn set_pixel(&mut self, coordinate: Vector2, value: u32) -> Result<(), &'static str> {
         match Visualizer::coord_to_buffer_idx(coordinate) {
             Ok(idx) => {
                 if let Some(e) = self.buffer.get_mut(idx) {
@@ -65,42 +71,43 @@ impl Visualizer {
     /// # `draw_line_at`
     /// PART OF MAIN DRAW LINE FUNCTION
     /// Draws a line using the Bersenham Line Algorithm byt taking a starting point `(usize, usize)`, terminal point `(usize, usize)` and colour data `u32`
-    fn draw_line_at(&mut self, start: (usize, usize), end: (usize, usize), colour: u32) -> Result<(), &'static str> {
-        let start = (start.0 as isize, start.1 as isize);
-        let end = (end.0 as isize, end.1 as isize);
+    fn draw_line_at(&mut self, start: Vector2, end: Vector2, colour: u32) -> Result<(), &'static str> {
+        let mut start = (start.x as isize, start.y as isize);
+        let end = (end.x as isize, end.y as isize);
 
-        let dx = end.0 - start.0;
-        let dy = end.1 - start.1;
-        let mut y = start.1;
-        let mut error = 0;
+        let dx = (end.0 - start.0).abs();
+        let sx = if start.0 < end.0 { 1 } else {-1 };
+        let dy = -(end.1 - start.1).abs();
+        let sy = if start.1 < end.1 { 1 } else {-1 };
+        let mut error = dx + dy;
 
-        let mut x = start.0;
-
-        while x <= end.0 {
-            match self.set_pixel((x as usize, y as usize), colour) {
-                Ok(_) => {
-                    error += dy;
-                    if (error << 1) >= dx {
-                        y += 1;
-                        error -= dx;
-                    }
-                    x += 1;
-                }
-                Err(err) => return Err(err)
+        loop {
+            self.set_pixel(Vector2::from_isize(start), colour);
+            if start.0 == end.0 && start.1 == end.1 { break;}
+            let e2 = 2 * error;
+            if e2 >= dy {
+                error += dy;
+                start.0 += sx;
+            }
+            if e2 <= dx {
+                error += dx;
+                start.1 += sy;
             }
         }
 
         Ok(())
     }
 
+
     /// # `draw_line`
     /// Takes a starting position `(usize)` and an terminal position `(usize, usize)` and a colour `(u32)` and thickness `usize`
     /// then draws a line from a starting point to an terminal point using Bersenham Line Algorithm
-    pub fn draw_line(&mut self, start: (usize, usize), end: (usize, usize), colour: u32, thickness: usize) -> Result<(), &'static str> {
+    pub fn draw_line(&mut self, start: Vector2, end: Vector2, colour: u32, thickness: usize) -> Result<(), &'static str> {
         for thick in 0..thickness {
+            let thick_coord = Vector2::new(thick as f32, thick as f32);
             self.draw_line_at(
-                (start.0 - thick, start.1 - thick), 
-                (end.0 - thick, end.1 - thick), 
+                start - thick_coord, 
+                end - thick_coord,
                 colour);
         }
 
@@ -111,47 +118,46 @@ impl Visualizer {
     /// PART OF ALGORITHM!
     /// Draws a part of the circle's edge by taking the center of the circle in the form `(usize, usize)` 
     /// and the part of the edges to draw `(usize, usize)`. 
-    fn draw_circle_edge(&mut self, center: (usize, usize), coord: (usize, usize), colour: u32) {
-        let center = (center.0 as isize, center.1 as isize);
-        let coord = (coord.0 as isize, coord.1 as isize);
+    fn draw_circle_edge(&mut self, center: Vector2, coord: Vector2, colour: u32) {
 
-        self.set_pixel(((center.0 + coord.0) as usize, (center.1 + coord.1) as usize), colour);
-        self.set_pixel(((center.0 - coord.0) as usize, (center.1 + coord.1) as usize), colour);
-        self.set_pixel(((center.0 + coord.0) as usize, (center.1 - coord.1) as usize), colour);
-        self.set_pixel(((center.0 - coord.0) as usize, (center.1 - coord.1) as usize), colour);
-        self.set_pixel(((center.0 + coord.1) as usize, (center.1 + coord.0) as usize), colour);
-        self.set_pixel(((center.0 - coord.1) as usize, (center.1 + coord.0) as usize), colour);
-        self.set_pixel(((center.0 + coord.1) as usize, (center.1 - coord.0) as usize), colour);
-        self.set_pixel(((center.0 - coord.1) as usize, (center.1 - coord.0) as usize), colour);
+        self.set_pixel(Vector2::new(center.x + coord.x, center.y + coord.y), colour);
+        self.set_pixel(Vector2::new(center.x - coord.x, center.y + coord.y), colour);
+        self.set_pixel(Vector2::new(center.x + coord.x, center.y - coord.y), colour);
+        self.set_pixel(Vector2::new(center.x - coord.x, center.y - coord.y), colour);
+        
+        self.set_pixel(Vector2::new(center.x + coord.y, center.y + coord.x), colour);
+        self.set_pixel(Vector2::new(center.x - coord.y, center.y + coord.x), colour);
+        self.set_pixel(Vector2::new(center.x + coord.y, center.y - coord.x), colour);
+        self.set_pixel(Vector2::new(center.x - coord.y, center.y - coord.x), colour);
     }
 
     /// # `draw_circle`
     /// Takes a center `(usize, usize)` and a radius `(usize, usize)` and a colour `(u32)` 
     /// and draws a circle using the Bersenham Circle Algorithm
-    pub fn draw_circle(&mut self, center: (usize, usize), radius: usize, colour: u32) {
-        let mut x = 0 as isize;
-        let mut y = radius as isize;
-        let mut d = 3 - 2 * radius as isize;
+    pub fn draw_circle(&mut self, center: Vector2, radius: f32, colour: u32) {
+        let mut x = 0.0;
+        let mut y = radius;
+        let mut d = 3.0 - 2.0 * radius;
 
-        self.draw_circle_edge(center, (x as usize,y as usize), colour);
+        self.draw_circle_edge(center, Vector2::new(x, y), colour);
 
         while y >= x {
-            x += 1;
-            if d > 0 {
-                y -= 1;
-                d = d + 4 * (x - y) + 10;
+            x += 1.0;
+            if d > 0.0 {
+                y -= 1.0;
+                d = d + 4.0 * (x - y) + 10.0;
             }
             else {
-                d = d + 4 * x + 6;
+                d = d + 4.0 * x + 6.0;
             }
-            self.draw_circle_edge(center, (x as usize,y as usize), colour);
+            self.draw_circle_edge(center, Vector2::new(x, y), colour);
         }
     }
 
     /// # `apply_buffer`
     /// Draws the content of the buffer unto the window
     pub fn apply_buffer(&mut self) {
-        self.window.update_with_buffer(&self.buffer, WIDTH, HEIGHT);
+        self.window.update_with_buffer(&self.buffer, U_WIDTH, U_HEIGHT);
     }
 
     /// # `end`
@@ -169,6 +175,6 @@ impl Visualizer {
             Some(a) => a,
             _ => super::colours::BLACK
         };
-        self.buffer = vec![colour; WIDTH * HEIGHT];
+        self.buffer = vec![colour; U_WIDTH * U_HEIGHT];
     }
 }
