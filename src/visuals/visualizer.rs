@@ -43,7 +43,7 @@ impl Visualizer {
     }
 
     /// # `coord_to_buffer_idx`
-    /// Takes a coordinate in the form of `(usize, usize)` and returns the index of that point in the buffer.
+    /// Takes a coordinate in the form of `Vector2` and returns the index of that point in the buffer.
     /// Returns a result which will contain and error if the coordinate are out of bounds
     fn coord_to_buffer_idx(coordinate: Vector2) -> Result<usize, &'static str> {
         match coordinate {
@@ -54,7 +54,7 @@ impl Visualizer {
     }
 
     /// # `set_pixel`
-    /// Takes a coordinate value as `(usize, usize)` and a colour value as `u32` and sets the pixel at that coordinate to that given colour.
+    /// Takes a coordinate value as `Vector2` and a colour value as `u32` and sets the pixel at that coordinate to that given colour.
     /// Returns a result which will contain an error if the coordinate is out of bounds
     pub fn set_pixel(&mut self, coordinate: Vector2, value: u32) -> Result<(), &'static str> {
         match Visualizer::coord_to_buffer_idx(coordinate) {
@@ -70,7 +70,7 @@ impl Visualizer {
 
     /// # `draw_line_at`
     /// PART OF MAIN DRAW LINE FUNCTION
-    /// Draws a line using the Bersenham Line Algorithm byt taking a starting point `(usize, usize)`, terminal point `(usize, usize)` and colour data `u32`
+    /// Draws a line using the Bersenham Line Algorithm byt taking a starting point `Vector2`, terminal point `Vector2` and colour data `u32`
     fn draw_line_at(&mut self, start: Vector2, end: Vector2, colour: u32) -> Result<(), &'static str> {
         let mut start = (start.x as isize, start.y as isize);
         let end = (end.x as isize, end.y as isize);
@@ -100,7 +100,7 @@ impl Visualizer {
 
 
     /// # `draw_line`
-    /// Takes a starting position `(usize)` and an terminal position `(usize, usize)` and a colour `(u32)` and thickness `usize`
+    /// Takes a starting position `Vector2` and an terminal position `Vector2` and a colour `(u32)` and thickness `usize`
     /// then draws a line from a starting point to an terminal point using Bersenham Line Algorithm
     pub fn draw_line(&mut self, start: Vector2, end: Vector2, colour: u32, thickness: usize) -> Result<(), &'static str> {
         for thick in 0..thickness {
@@ -116,10 +116,11 @@ impl Visualizer {
 
     /// # `draw_circle_edge`
     /// PART OF ALGORITHM!
-    /// Draws a part of the circle's edge by taking the center of the circle in the form `(usize, usize)` 
-    /// and the part of the edges to draw `(usize, usize)`. 
+    /// Draws a part of the circle's edge by taking the center of the circle in the form `Vector2` 
+    /// and the part of the edges to draw `Vector2`. 
     fn draw_circle_edge(&mut self, center: Vector2, coord: Vector2, colour: u32) {
 
+        // The 8 points of the circle to begin drawing from
         self.set_pixel(Vector2::new(center.x + coord.x, center.y + coord.y), colour);
         self.set_pixel(Vector2::new(center.x - coord.x, center.y + coord.y), colour);
         self.set_pixel(Vector2::new(center.x + coord.x, center.y - coord.y), colour);
@@ -132,7 +133,7 @@ impl Visualizer {
     }
 
     /// # `draw_circle`
-    /// Takes a center `(usize, usize)` and a radius `(usize, usize)` and a colour `(u32)` 
+    /// Takes a center `Vector2` and a radius `Vector2` and a colour `(u32)` 
     /// and draws a circle using the Bersenham Circle Algorithm
     pub fn draw_circle(&mut self, center: Vector2, radius: f32, colour: u32) {
         let mut x = 0.0;

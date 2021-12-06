@@ -15,6 +15,7 @@ fn main()
         "circle_line" => fractals::circle_line::CircleLine::new().draw(),
         "circle_space" => fractals::circle_space::CircleSpace::new().draw(),
         "koch" => fractals::koch::Koch::new().draw(),
+        "sierpinski" => fractals::sierpinski::SierpinskiTriangle::new().draw(),
         _ => panic!("No such fractal \"{}\"", args[1])
     }
 
@@ -24,7 +25,8 @@ fn main()
 pub mod tests {
     use super::math::{matrix::Matrix2, vector::Vector2};
     use std::f32::consts::PI;
-    #[test]
+
+    #[test] // Testing matrix operation such as rotation, inverse and identity (determinant included in inverse)
     fn matrix_operations() {
         let rot = Matrix2::rotation(-PI / 2.0);
         let rotinv = rot.inverse().unwrap();

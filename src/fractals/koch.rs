@@ -82,7 +82,7 @@ impl Koch {
     /// # `generate`
     /// Generates the next set of lines of the fractal
     fn generate(&mut self) {
-        let mut next : Vec<KochLine> = Vec::new();
+        let mut next : Vec<KochLine> = Vec::with_capacity(self.koch_lines.len() * 4); // Every iteration lines increase by 4 per line
 
         for line in self.koch_lines.iter() {
             let a = line.koch_a();

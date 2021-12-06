@@ -33,16 +33,16 @@ impl Matrix2 {
         }
     }
 
-    /// # `determinate`
-    /// Returns the determinate of the matrix as an `f32`
-    pub fn determinate(&self) -> f32 {
+    /// # `determinant`
+    /// Returns the determinant of the matrix as an `f32`
+    pub fn determinant(&self) -> f32 {
         self.c11 * self.c22 - self.c12 * self.c21
     }
 
     /// # `inverse`
     /// Returns the inverse of the matrix
     pub fn inverse(&self) -> Option<Matrix2> {
-        let det = self.determinate();
+        let det = self.determinant();
 
         if det != 0.0 {
             return Some((1.0 / det) * Matrix2 {
