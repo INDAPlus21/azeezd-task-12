@@ -1,6 +1,6 @@
 use super::super::visuals::{
     visualizer::Visualizer,
-    visualizer::{WIDTH},
+    visualizer::{WIDTH, HEIGHT},
     colours
 };
 
@@ -12,7 +12,7 @@ use super::super::math::{
 // Consts
 const DEPTH : usize = 10;
 const ANGLE : f32 = -std::f32::consts::PI / 3.0;
-const INIT_LINE_START : Vector2 = Vector2 {x: 50.0, y:300.0};
+const INIT_LINE_START : Vector2 = Vector2 {x: 50.0, y: HEIGHT / 2.0};
 const INIT_LINE_END : Vector2 = Vector2 {x: WIDTH - INIT_LINE_START.x , y: INIT_LINE_START.y};
 
 struct KochLine {

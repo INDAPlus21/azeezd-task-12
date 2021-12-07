@@ -16,6 +16,8 @@ fn main()
         "circle_space" => fractals::circle_space::CircleSpace::new().draw(),
         "koch" => fractals::koch::Koch::new().draw(),
         "sierpinski" => fractals::sierpinski::SierpinskiTriangle::new().draw(),
+        "tree" => fractals::tree::simple::SimpleTree::new().draw(),
+        "diablos_tree" => fractals::tree::diablos_tree::DiablosTree::new().draw(),
         _ => panic!("No such fractal \"{}\"", args[1])
     }
 

@@ -14,3 +14,5 @@ Currently available fractals
 - **Space of circles:** `circle_space`
 - **Koch Curve:** `koch`
 - **Sierpinski Triangle:** `sierpinski`
+- **Tree Fractal (Simple):** `tree`
+- **(Custom) Diablo's Tree:** `diablos_tree`

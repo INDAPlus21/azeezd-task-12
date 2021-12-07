@@ -1,6 +1,6 @@
 use super::super::visuals::{
     visualizer::Visualizer,
-    visualizer::{WIDTH},
+    visualizer::{WIDTH, HEIGHT},
     colours
 };
 
@@ -13,8 +13,8 @@ use std::f32::consts::PI;
 
 // Consts
 const DEPTH : usize = 10;
-const POINT_A : Vector2 = Vector2 {x: 100.0, y: 550.0};
-const POINT_B : Vector2 = Vector2 {x: WIDTH - 100.0, y: 550.0};
+const POINT_A : Vector2 = Vector2 {x: 100.0, y: HEIGHT - 50.0};
+const POINT_B : Vector2 = Vector2 {x: WIDTH - 100.0, y: POINT_A.y};
 const SQRT_3 : f32 = 1.73205080757;
 
 /// # `Triangle`
@@ -76,11 +76,11 @@ impl SierpinskiTriangle {
     /// Draw the fractal on the screen
     pub fn draw(&mut self) {
         for _ in 0..DEPTH {
-            self.generate();
             for elem in self.triangles.iter() {
                 elem.draw(&mut self.visualizer);
             }
             self.visualizer.apply_buffer();
+            self.generate();
         }
 
         self.visualizer.end();
