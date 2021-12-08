@@ -1,7 +1,10 @@
 use crate::visuals::{
-    visualizer::Visualizer,
+    visualizer::{WIDTH, HEIGHT, Visualizer},
     colours
 };
+use minifb::{MouseButton, MouseMode};
+
+use std::f32::consts::PI;
 
 use crate::math::{
     matrix::Matrix2,
@@ -23,7 +26,7 @@ impl SimpleTree {
     /// Initializes a new simple tree visualizer
     pub fn new() -> SimpleTree {
         SimpleTree {
-            visualizer: Visualizer::new(Some(500)),
+            visualizer: Visualizer::new(None),
             branches: vec![Branch::new_stem()],
 
             // matrices are "rotate by some angle and scale length by some factor"
@@ -48,15 +51,35 @@ impl SimpleTree {
     /// # `draw`
     /// Displays the fractal onto the window
     pub fn draw(&mut self) {
-        for curr_depth in 0..super::DEPTH {
-            for branch in self.branches.iter() {
-                self.visualizer.draw_line(branch.start, branch.end, colours::CERISE, super::DEPTH - curr_depth);
+
+        // Since there is a while window is open loop, no need for visualizer.end() at the end of the draw function
+        while self.visualizer.window.is_open() {
+            // generating and drawing the tree
+            for curr_depth in 0..super::DEPTH {
+                for branch in self.branches.iter() {
+                    self.visualizer.draw_line(branch.start, branch.end, colours::CERISE, super::DEPTH - curr_depth);
+                }
+                self.generate();
             }
             self.visualizer.apply_buffer();
 
-            self.generate();
-        }
+            // Upon user mouse click this exits the loop and continues down
+            while !self.visualizer.window.get_mouse_down(MouseButton::Left) && self.visualizer.window.is_open() {
+                self.visualizer.window.update();
+            }
 
-        self.visualizer.end();
+            // Get mouse position and generate angle and growth based on the position
+            let mouse_pos = self.visualizer.window.get_mouse_pos(MouseMode::Clamp).unwrap();
+            let angle = (mouse_pos.0 / WIDTH - 0.5) * 2.0 * PI;
+            let growth = 1.0 - mouse_pos.1 / HEIGHT;
+
+            // Generate matrices based on given angle or growth
+            self.growth_matrix_1 = growth * Matrix2::rotation(angle);
+            self.growth_matrix_2 = growth * Matrix2::rotation(-angle);
+
+            // Clean up before new tree drawing
+            self.branches = vec![Branch::new_stem()];
+            self.visualizer.clear(None);
+        }
     }
 }

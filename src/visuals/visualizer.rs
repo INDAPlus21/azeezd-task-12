@@ -162,7 +162,7 @@ impl Visualizer {
     }
 
     /// # `end`
-    /// Should always be placed at the end of a visualization to avoid window from closing
+    /// Should always be placed at the end of a visualization to avoid window from closing unless there is a while loop checking for if the window is open
     pub fn end(&mut self) {
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
             self.window.update();

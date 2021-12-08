@@ -18,6 +18,7 @@ const GROWTH_FACTOR : f32 = 0.7;
 
 /// # `Branch`
 /// Structure for the building blocks of the Fractal Trees
+#[derive(Copy, Clone, Debug)]
 pub struct Branch {
     start: Vector2,
     end: Vector2
@@ -58,3 +59,4 @@ impl Branch {
 
 pub mod diablos_tree;
 pub mod simple;
+pub mod lsystree;

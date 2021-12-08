@@ -18,6 +18,7 @@ fn main()
         "sierpinski" => fractals::sierpinski::SierpinskiTriangle::new().draw(),
         "tree" => fractals::tree::simple::SimpleTree::new().draw(),
         "diablos_tree" => fractals::tree::diablos_tree::DiablosTree::new().draw(),
+        "lsystem_tree" => fractals::tree::lsystree::LSystemTree::new().draw(),
         _ => panic!("No such fractal \"{}\"", args[1])
     }
 
