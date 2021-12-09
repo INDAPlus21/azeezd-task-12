@@ -19,4 +19,4 @@ Currently available fractals
 - **(Custom) Diablo's Tree:** `diablos_tree`
 - **Mandelbrot Set (Zooms on some nice point)** `mandelbrot`
 
-†: When window opens, hold left mouse button to being the animation
+†: When window opens, hold left mouse button to begin the animation
