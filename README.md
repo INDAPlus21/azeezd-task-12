@@ -15,7 +15,7 @@ Currently available fractals
 - **Koch's Curve†:** `koch`
 - **Sierpinski's Triangle†:** `sierpinski`
 - **Tree Fractal (Mouse Responsive):** `tree`
-- **L-System Tree (Grows on click):** `lsys_tree`
+- **L-System Tree (Grows on click):** `lsystem_tree`
 - **(Custom) Diablo's Tree:** `diablos_tree`
 - **Mandelbrot Set (Zooms on some nice point)** `mandelbrot`
 
