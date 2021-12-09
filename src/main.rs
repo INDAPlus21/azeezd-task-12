@@ -19,6 +19,7 @@ fn main()
         "tree" => fractals::tree::simple::SimpleTree::new().draw(),
         "diablos_tree" => fractals::tree::diablos_tree::DiablosTree::new().draw(),
         "lsystem_tree" => fractals::tree::lsystree::LSystemTree::new().draw(),
+        "mandelbrot" => fractals::mandelbrot::Mandelbrot::new().draw(),
         _ => panic!("No such fractal \"{}\"", args[1])
     }
 

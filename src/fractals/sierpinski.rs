@@ -75,6 +75,9 @@ impl SierpinskiTriangle {
     /// # `draw`
     /// Draw the fractal on the screen
     pub fn draw(&mut self) {
+        self.visualizer.apply_buffer();
+        self.visualizer.left_pressed();
+        
         for _ in 0..DEPTH {
             for elem in self.triangles.iter() {
                 elem.draw(&mut self.visualizer);

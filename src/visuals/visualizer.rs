@@ -1,5 +1,5 @@
 extern crate minifb;
-use minifb::{Window, WindowOptions, Key};
+use minifb::{Window, WindowOptions, Key, MouseButton, MouseMode};
 
 use crate::math::vector::*;
 
@@ -8,8 +8,8 @@ pub const WIDTH : f32 = 800.0;
 pub const HEIGHT : f32 = 600.0;
 
 // As usize for buffer access
-const U_WIDTH : usize = WIDTH as usize;
-const U_HEIGHT : usize = HEIGHT as usize;
+pub const U_WIDTH : usize = WIDTH as usize;
+pub const U_HEIGHT : usize = HEIGHT as usize;
 
 /// # `Visualizer`
 /// Struct used to manipulate the pixel buffer of the screen
@@ -177,5 +177,19 @@ impl Visualizer {
             _ => super::colours::BLACK
         };
         self.buffer = vec![colour; U_WIDTH * U_HEIGHT];
+    }
+
+    /// # `left_pressed`
+    /// Stops the program from continuing (draw updates unaffected) until the mouse is pressed upon which this returns the position of the mouse
+    pub fn left_pressed(&mut self) -> Vector2 {
+        while !self.window.get_mouse_down(MouseButton::Left) && self.window.is_open() {
+            self.window.update();
+        }
+
+        let pos = self.window.get_mouse_pos(MouseMode::Clamp).unwrap();
+        Vector2 {
+            x: pos.0,
+            y: pos.1
+        }
     }
 }

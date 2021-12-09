@@ -118,6 +118,8 @@ impl Koch {
     /// # `draw`
     /// Draws the currently stored lines of the fractal
     pub fn draw(&mut self) {
+        self.visualizer.apply_buffer();
+        self.visualizer.left_pressed();
         for _ in 0..DEPTH { 
             for line in self.koch_lines.iter() {
                 line.draw(&mut self.visualizer);
@@ -127,6 +129,6 @@ impl Koch {
             self.generate();
         }
 
-        self.visualizer.end()
+        self.visualizer.end();
     }
 }

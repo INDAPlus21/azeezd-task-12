@@ -43,6 +43,9 @@ impl CircleSpace {
 
 
     pub fn draw(&mut self) {
+        self.visualizer.apply_buffer();
+        self.visualizer.left_pressed();
+        
         self.circle(STARTING_POINT, STARTING_RADIUS);
 
         self.visualizer.end();

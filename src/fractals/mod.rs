@@ -4,3 +4,4 @@ pub mod circle_space;
 pub mod koch;
 pub mod sierpinski;
 pub mod tree;
+pub mod mandelbrot;

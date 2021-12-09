@@ -34,7 +34,7 @@ impl LSystemTree {
         let mut lsystem = LSystem::new();
         lsystem.add_rule('F', "-F+F+[+F+F-FF]-[-FF-F+F]".to_string());
         LSystemTree {
-            visualizer: Visualizer::new(Some(100)),
+            visualizer: Visualizer::new(Some(70)),
             branches: vec![Branch::new_stem()],
             rules: lsystem,
             length: STARTING_LENGTH
@@ -106,10 +106,8 @@ impl LSystemTree {
             // Clear tree
             self.branches = vec![Branch::new_stem()];
 
-            // Upon user mouse click this exits the loop and continues down
-            while !self.visualizer.window.get_mouse_down(MouseButton::Left) && self.visualizer.window.is_open() {
-                self.visualizer.window.update();
-            }
+            // Stop until mouse clicked
+            self.visualizer.left_pressed();
 
             // Generate new tree
             sentence = self.rules.generate(sentence);

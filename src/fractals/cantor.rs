@@ -43,7 +43,8 @@ impl CantorsSet {
     /// # `draw`
     /// Draws the Cantor Set on the window
     pub fn draw(&mut self) {
-
+        self.visualizer.apply_buffer();
+        self.visualizer.left_pressed();
         self.cantor(STARTING_POINT, LINE_LENGTH, 0);
 
         self.visualizer.end();

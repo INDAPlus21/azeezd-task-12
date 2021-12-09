@@ -63,15 +63,10 @@ impl SimpleTree {
             }
             self.visualizer.apply_buffer();
 
-            // Upon user mouse click this exits the loop and continues down
-            while !self.visualizer.window.get_mouse_down(MouseButton::Left) && self.visualizer.window.is_open() {
-                self.visualizer.window.update();
-            }
-
             // Get mouse position and generate angle and growth based on the position
-            let mouse_pos = self.visualizer.window.get_mouse_pos(MouseMode::Clamp).unwrap();
-            let angle = (mouse_pos.0 / WIDTH - 0.5) * 2.0 * PI;
-            let growth = 1.0 - mouse_pos.1 / HEIGHT;
+            let mouse_pos = self.visualizer.left_pressed();
+            let angle = (mouse_pos.x / WIDTH - 0.5) * 2.0 * PI;
+            let growth = 1.0 - mouse_pos.y / HEIGHT;
 
             // Generate matrices based on given angle or growth
             self.growth_matrix_1 = growth * Matrix2::rotation(angle);
